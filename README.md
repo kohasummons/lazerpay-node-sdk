@@ -1,70 +1,119 @@
-<p>
-<img title="Lazerpay" src= "https://res.cloudinary.com/njokuscript/image/upload/v1646279538/lazerpay_logo_no-bg_trkkye.png" width="300px"/>
-</p>
+<div align="center">
+<img title="Lazerpay" align="center" src= "https://res.cloudinary.com/njokuscript/image/upload/v1646279538/lazerpay_logo_no-bg_trkkye.png" width="300px"/>
+</div>
+  
+#  Lazerpay Nodejs SDK
 
-#### The Lazerpay v1 NodeJS SDK
+[![npm version](https://img.shields.io/npm/v/lazerpay-node-sdk)](https://www.npmjs.org/package/lazerpay-node-sdk)
 
-### How to use
+<!-- <div> -->
+<!-- <img title="Lazerpay" src= "https://res.cloudinary.com/njokuscript/image/upload/v1646279538/lazerpay_logo_no-bg_trkkye.png" width="300px"/>  -->
+<!-- [![npm version](https://img.shields.io/npm/v/lazerpay.svg?style=flat-square)](https://www.npmjs.org/package/lazerpay-node-sdk) -->
 
-```bash 
-npm install lazerpay-node-sdk
+<!-- TODO -->
+<!-- Submit Lazerpay logo to simple icons -->
+<!-- </div> -->
+
+The Lazerpay Nodejs SDK provides easy access to the Lazerpay API for applications written in server-side javascript.
+
+## Requirements
+<!-- TO REVIEW -->
+Node 8, 10 or higher
+
+## Installation
+
+Using npm:
+
+```bash
+# install locally(recommended)
+npm install lazerpay-node-sdk --save
 ```
 
-Using yarn,
+Using yarn
 
-```bash 
+```bash
 yarn add lazerpay-node-sdk
 ```
 
-```javascript
-const Lazerpay = require('lazerpay-node-sdk');
+## Usage
 
-const lazerpay = new Lazerpay(LAZER_PUBLIC_KEY, LAZER_SECRET_KEY);
+The package needs to be configured with your account's secret key and public key, which is
+available in the [Lazerpay Dashboard][api-keys]. Require Lazerpay from the `lazerpay-node-sdk` and instantiate it with your key's value:
+
+> Use TEST API keys for testing, and LIVE API keys for production.
+
+> Never expose your secret keys. We recommend you supply your keys from a .ENV file.
+
+```js
+const Lazerpay = require('lazerpay-node-sdk');
+const lazer = new Lazerpay(LAZER_PUBLIC_KEY, LAZER_SECRET_KEY);
+
+lazer.Misc.getWalletBalance("USDT")
+  .then(walletBalance => console.log(walletBalance))
+  .catch(error => console.error(error));
 ```
 
-Use TEST API keys for testing, and LIVE API keys for production
+Using ES modules and `async`/`await`:
 
-## Lazerpay Methods exposed by the sdk
+```js
+
+import Lazerpay from 'lazerpay-node-sdk';
+const lazer = new Lazerpay(LAZER_PUBLIC_KEY, LAZER_SECRET_KEY);
+
+(async () => {
+  try{
+    const walletBalance = await lazer.Misc.getWalletBalance("USDT");
+    console.log(walletBalance);
+  } catch(error){
+      console.log(error)
+  }
+})();
+
+```
+
+## Documentation
+
+The SDK exposes the following methods:
 
 **1**. **Payment**
 
-- Initialize Payment
-- Confirm Payment
+- [Initialize Payment](#initialize-payment) - initiate a crypto payment transfer
+- [Confirm Payment](#initialize-payment) - confirm your customers transaction after payment has been made
 
 **2**. **Payout**
 
-- Crypto Payout
-- Bank Payout ~ This is coming to V2
+- [Crypto Payout](#initialize-payment) - withdraw crypto in Lazerpay balance to an external address
+- Bank Payout - This is coming to v2
 
 **3**. **Swap**
 
-- Crypto swap
-- Get Crypto Swap Amount Out
+- [Crypto swap](#crypto-swap) - swap between two stable coins
+- [Get Crypto Swap Amount Out](#get-crypto-swap-amount-out) - get amount to receive before swaping coins
 
 **4**. **Payment Links**
 
-- Create payment links
-- Get all payment links
-- Get a single payment link
-- Update a payment Link
+- [Create payment links](#create-a-payment-link) - create a Payment link
+- [Get all payment links](#get-all-payment-links) - get all Payment links created
+- [Get a single payment link](#get-a-single-payment-link) - get a Payment link by it's identifier
+- [Update a payment Link](#update-a-payment-link) - disable or enable a Payment link
 
 **5**. **Misc**
 
-- Get all accepted coins
-- Get wallet balance
+- [Get all accepted coins](#get-all-payment-links) - get the list of accepted cryptocurrencies on Lazerpay
+- [Get wallet balance](#get-wallet-balance) - get wallet balance
 
 ## Payment
 
-#### `Initialize Payment`
+### `Initialize Payment`
 
-This describes to allow your customers to initiate a crypto payment transfer.
+This describes to allow your customers initiate a crypto payment transfer.
 
 ```javascript
 const Lazerpay = require('lazerpay-node-sdk');
 
-const lazerpay = new Lazerpay(LAZER_PUBLIC_KEY, LAZER_SECRET_KEY);
+const lazer = new Lazerpay(LAZER_PUBLIC_KEY, LAZER_SECRET_KEY);
 
-const payment_tx = async () => {
+const paymentTxn = async () => {
   try {
     const transaction_payload = {
       reference: 'YOUR_REFERENCE', // Replace with a reference you generated
@@ -88,14 +137,25 @@ const payment_tx = async () => {
 };
 ```
 
-#### `Confirm Payment`
+| Payload              | Default            | Description                                                                                                                                                                                                                                       |
+| ------------------- | ------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `reference`        | `null`             | Reference your generated
+| `customer_name`        | `null`             | Name of the customer
+| `customer_email`        | `null`             | Email address of the customer
+| `coin`        | `BUSD`             | -
+| `currency`        | `USD`             | -
+| `amount`        | `null`             | Amount to recieve from customer
+| `accept_partial_payment`        | `false`             | Allow partial payment from custormer. [Learn more](https://--)
+| `metadata`        | `null`             | Add additional information to the payment transaction. Metadata is an optional parameter. [Learn more](#https://--)
+
+### `Confirm Payment`
 
 This describes to allow you confirm your customers transaction after payment has been made.
 
 ```javascript
 const Lazerpay = require('lazerpay-node-sdk');
 
-const lazerpay = new Lazerpay(LAZER_PUBLIC_KEY, LAZER_SECRET_KEY);
+const lazer = new Lazerpay(LAZER_PUBLIC_KEY, LAZER_SECRET_KEY);
 
 const confirm_tx = async () => {
   try {
@@ -115,14 +175,14 @@ const confirm_tx = async () => {
 
 ## Transfer
 
-#### `Crypto Payout`
+### `Crypto Payout`
 
 This describes to allow you withdraw the crypto in their lazerpay balance to an external address
 
 ```javascript
 const Lazerpay = require('lazerpay-node-sdk');
 
-const lazerpay = new Lazerpay(LAZER_PUBLIC_KEY, LAZER_SECRET_KEY);
+const lazer = new Lazerpay(LAZER_PUBLIC_KEY, LAZER_SECRET_KEY);
 
 const crypto_payout_tx = async () => {
   const transaction_payload = {
@@ -145,14 +205,14 @@ const crypto_payout_tx = async () => {
 
 ## Swap
 
-#### `Crypto swap`
+### `Crypto swap`
 
-This describes to allow you swap swap between two stable coins 
+This describes to allow you swap between two stable coins
 
 ```javascript
 const Lazerpay = require('lazerpay-node-sdk');
 
-const lazerpay = new Lazerpay(LAZER_PUBLIC_KEY, LAZER_SECRET_KEY);
+const lazer = new Lazerpay(LAZER_PUBLIC_KEY, LAZER_SECRET_KEY);
 
 const crypto_swap_tx = async () => {
   const swap_payload = {
@@ -173,14 +233,14 @@ const crypto_swap_tx = async () => {
 };
 ```
 
-#### `Get Crypto Swap Amount Out`
+### `Get Crypto Swap Amount Out`
 
 This describes the amount you will receive on swap even before initiating the swap  
 
 ```javascript
 const Lazerpay = require('lazerpay-node-sdk');
 
-const lazerpay = new Lazerpay(LAZER_PUBLIC_KEY, LAZER_SECRET_KEY);
+const lazer = new Lazerpay(LAZER_PUBLIC_KEY, LAZER_SECRET_KEY);
 
 const crypto_swap_tx = async () => {
   const swap_payload = {
@@ -200,14 +260,14 @@ const crypto_swap_tx = async () => {
 
 ## Payment Links
 
-#### `Create a payment link`
+### `Create a payment link`
 
-This describes to allow you create a Payment link programatically
+This describes creating a Payment link programatically
 
 ```javascript
 const Lazerpay = require('lazerpay-node-sdk');
 
-const lazerpay = new Lazerpay(LAZER_PUBLIC_KEY, LAZER_SECRET_KEY);
+const lazer = new Lazerpay(LAZER_PUBLIC_KEY, LAZER_SECRET_KEY);
 
 const create_paymentlink_tx = async () => {
   const transaction_payload = {
@@ -230,14 +290,14 @@ const create_paymentlink_tx = async () => {
 };
 ```
 
-#### `Update a payment link`
+### `Update a payment link`
 
 This describes disabling or enabling a payment link by updating it
 
 ```javascript
 const Lazerpay = require('lazerpay-node-sdk');
 
-const lazerpay = new Lazerpay(LAZER_PUBLIC_KEY, LAZER_SECRET_KEY);
+const lazer = new Lazerpay(LAZER_PUBLIC_KEY, LAZER_SECRET_KEY);
 
 const transaction_payload = {
   identifier: '7f2vrd8n',
@@ -256,14 +316,14 @@ const update_paymentLink = async () => {
 };
 ```
 
-#### `Get all payment links`
+### `Get all payment links`
 
 This describes to allow you get all Payment links created
 
 ```javascript
 const Lazerpay = require('lazerpay-node-sdk');
 
-const lazerpay = new Lazerpay(LAZER_PUBLIC_KEY, LAZER_SECRET_KEY);
+const lazer = new Lazerpay(LAZER_PUBLIC_KEY, LAZER_SECRET_KEY);
 
 const get_all_paymentlinks = async () => {
   try {
@@ -275,14 +335,14 @@ const get_all_paymentlinks = async () => {
 };
 ```
 
-#### `Get a single payment link`
+### `Get a single payment link`
 
 This describes to allow you get a Payment link by it's identifier
 
 ```javascript
 const Lazerpay = require('lazerpay-node-sdk');
 
-const lazerpay = new Lazerpay(LAZER_PUBLIC_KEY, LAZER_SECRET_KEY);
+const lazer = new Lazerpay(LAZER_PUBLIC_KEY, LAZER_SECRET_KEY);
 
 const identifier = '7f2vrd8n';
 
@@ -298,14 +358,14 @@ const get_paymentlink = async () => {
 
 ## Misc
 
-#### `Get Accepted Coins`
+### `Get Accepted Coins`
 
 This gets the list of accepted cryptocurrencies on Lazerpay
 
 ```javascript
 const Lazerpay = require('lazerpay-node-sdk');
 
-const lazerpay = new Lazerpay(LAZER_PUBLIC_KEY, LAZER_SECRET_KEY);
+const lazer = new Lazerpay(LAZER_PUBLIC_KEY, LAZER_SECRET_KEY);
 
 const get_accepted_coins = async () => {
   try {
@@ -317,15 +377,14 @@ const get_accepted_coins = async () => {
 };
 ```
 
+### `Get Wallet Balance`
 
-#### `Get Wallet Balance`
-
-Get get wallet balance by specifying the coin
+Get wallet balance by specifying the coin
 
 ```javascript
 const Lazerpay = require('lazerpay-node-sdk');
 
-const lazerpay = new Lazerpay(LAZER_PUBLIC_KEY, LAZER_SECRET_KEY);
+const lazer = new Lazerpay(LAZER_PUBLIC_KEY, LAZER_SECRET_KEY);
 
 const get_wallet_balance = async () => {
   try {
@@ -337,3 +396,5 @@ const get_wallet_balance = async () => {
   }
 };
 ```
+
+[api-keys]: https://dashboard.lazerpay.finance/settings
